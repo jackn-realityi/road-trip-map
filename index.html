@@ -33,9 +33,38 @@
   .leaflet-popup-content b{color:#fff;}
   .leaflet-popup-content{font-size:12.5px;}
   #legend-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+  #menu-btn{display:none;}
+
+  @media (max-width: 768px){
+    #app{position:relative;}
+    #menu-btn{
+      display:flex;align-items:center;justify-content:center;
+      position:fixed;top:12px;left:12px;z-index:1100;
+      width:44px;height:44px;border-radius:10px;border:1px solid var(--panel-border);
+      background:var(--panel);color:var(--text);font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.4);
+    }
+    #sidebar{
+      position:fixed;top:0;left:0;height:100%;width:85%;max-width:340px;
+      transform:translateX(-100%);transition:transform 0.25s ease;
+      z-index:1050;box-shadow:2px 0 16px rgba(0,0,0,0.5);
+      padding-top:64px;
+    }
+    #sidebar.open{transform:translateX(0);}
+    #sidebar-backdrop{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1040;
+    }
+    #sidebar-backdrop.open{display:block;}
+    #map{width:100%;}
+    .day-header{padding:12px;}
+    .checkbox{width:20px;height:20px;}
+    .leaflet-popup-content{font-size:14px;}
+  }
 </style>
 </head>
 <body>
+<button id="menu-btn" aria-label="Toggle trip days">☰</button>
+<div id="sidebar-backdrop"></div>
 <div id="app">
   <div id="sidebar">
     <h1>CT → Seattle Road Trip</h1>
@@ -244,6 +273,35 @@ days.forEach(day => {
 });
 
 map.fitBounds(allBounds, { padding: [30,30] });
+
+// Mobile sidebar drawer toggle
+const menuBtn = document.getElementById('menu-btn');
+const sidebarEl = document.getElementById('sidebar');
+const backdropEl = document.getElementById('sidebar-backdrop');
+
+function openSidebar() {
+  sidebarEl.classList.add('open');
+  backdropEl.classList.add('open');
+}
+function closeSidebar() {
+  sidebarEl.classList.remove('open');
+  backdropEl.classList.remove('open');
+  setTimeout(() => map.invalidateSize(), 260);
+}
+menuBtn.addEventListener('click', () => {
+  if (sidebarEl.classList.contains('open')) closeSidebar();
+  else openSidebar();
+});
+backdropEl.addEventListener('click', closeSidebar);
+
+// Auto-close the drawer on mobile after picking a route from Google Maps
+if (window.matchMedia('(max-width: 768px)').matches) {
+  dayListEl.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => setTimeout(closeSidebar, 200));
+  });
+}
+
+window.addEventListener('resize', () => map.invalidateSize());
 </script>
 </body>
 </html>
