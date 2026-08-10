@@ -36,6 +36,23 @@
 
   #menu-btn{display:none;}
 
+  #live-location-btn{
+    display:none;position:fixed;bottom:20px;right:20px;z-index:1100;
+    align-items:center;gap:8px;padding:12px 18px;border-radius:999px;
+    background:#e74c3c;color:#fff;text-decoration:none;font-size:14px;font-weight:600;
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);border:none;
+  }
+  #live-location-btn.visible{display:flex;}
+  #live-location-btn .pulse-dot{
+    width:9px;height:9px;border-radius:50%;background:#fff;
+    animation:pulse 1.4s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,255,255,0.6);}
+    70%{box-shadow:0 0 0 8px rgba(255,255,255,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+  }
+
   @media (max-width: 768px){
     #app{position:relative;}
     #menu-btn{
@@ -65,6 +82,9 @@
 <body>
 <button id="menu-btn" aria-label="Toggle trip days">☰</button>
 <div id="sidebar-backdrop"></div>
+<a id="live-location-btn" target="_blank" rel="noopener">
+  <span class="pulse-dot"></span> Live location
+</a>
 <div id="app">
   <div id="sidebar">
     <h1>CT → Seattle Road Trip</h1>
@@ -302,6 +322,21 @@ if (window.matchMedia('(max-width: 768px)').matches) {
 }
 
 window.addEventListener('resize', () => map.invalidateSize());
+
+// Load config.json to conditionally show the live-location button.
+// Edit config.json directly on github.com (even from a phone browser) to
+// toggle "showLiveLocation" and update "liveLocationUrl" — no code changes needed.
+fetch('config.json', { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(cfg => {
+    if (!cfg) return;
+    const btn = document.getElementById('live-location-btn');
+    if (cfg.showLiveLocation && cfg.liveLocationUrl) {
+      btn.href = cfg.liveLocationUrl;
+      btn.classList.add('visible');
+    }
+  })
+  .catch(() => { /* config.json missing or unreachable — button stays hidden */ });
 </script>
 </body>
 </html>
