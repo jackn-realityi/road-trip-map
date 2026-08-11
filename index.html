@@ -15,6 +15,11 @@
   #sidebar{width:340px;min-width:280px;background:var(--panel);border-right:1px solid var(--panel-border);overflow-y:auto;padding:16px;box-sizing:border-box;}
   #sidebar h1{font-size:17px;margin:0 0 4px;}
   #sidebar .sub{color:var(--muted);font-size:12.5px;margin-bottom:14px;}
+  #version-select{
+    width:100%;margin-bottom:14px;padding:10px 12px;border-radius:8px;
+    background:#101923;color:var(--text);border:1px solid var(--panel-border);
+    font-size:13px;font-weight:600;
+  }
   .day-card{border:1px solid var(--panel-border);border-radius:10px;margin-bottom:10px;overflow:hidden;background:#101923;}
   .day-header{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;user-select:none;}
   .swatch{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
@@ -88,7 +93,11 @@
 <div id="app">
   <div id="sidebar">
     <h1>CT → Seattle Road Trip</h1>
-    <div class="sub">Sat 8/15 – Fri 8/21 · 7 days · click a day to see stops, or toggle it on/off the map</div>
+    <div class="sub">Sat 8/15 – Fri 8/21 · click a day to see stops, or toggle it on/off the map</div>
+    <select id="version-select">
+      <option value="original">Version 1 — Original (via Coeur d'Alene)</option>
+      <option value="updated">Version 2 — Updated (via Butte &amp; Moscow)</option>
+    </select>
     <div id="day-list"></div>
     <div id="legend-note">Routes are traced along actual roads (via OSRM routing). Use the "Open in Google Maps" links for live turn-by-turn directions.</div>
   </div>
@@ -96,7 +105,8 @@
 </div>
 
 <script>
-const days = [
+// Days 1–4 are identical in both itinerary versions.
+const sharedDays = [
   {
     id: 1, color: "#e6194b", title: "Day 1 — Sat 8/15: Bethany, CT → Portage, IN",
     summary: "~760 mi, ~12h wheel time. I-84 → I-380 → I-80 across PA/OH → I-80/90 into Indiana. Skips Pittsburgh & Chicago.",
@@ -148,47 +158,103 @@ const days = [
       { name: "Custer State Park", lat: 43.7566, lng: -103.4257, note: "~$20/vehicle 7-day pass — Wildlife Loop Rd, picnic lunch" },
       { name: "Spearfish, SD", lat: 44.4908, lng: -103.8593, note: "Overnight — arrive ~3:00 PM" }
     ]
-  },
-  {
-    id: 5, color: "#911eb4", title: "Day 5 — Spearfish, SD → Devils Tower → Theodore Roosevelt NP → Miles City, MT",
-    summary: "~430 mi, ~8h driving plus stops.",
-    gmaps: "https://www.google.com/maps/dir/Spearfish,+SD/Devils+Tower+National+Monument,+WY/Theodore+Roosevelt+National+Park,+Medora,+ND/Miles+City,+MT",
-    route: "qrpnGd_|xRsrDtWifDjpTpNbx[zrB`wObvWjy_@_Jp}e@w}RhvU_cPzuDalTui[ae@oiUnvHm}QfrBibd@w_Agg|@k}a@gy@m{Wcfr@wlKklFetsBeZswE_xJym`@oeT{bdAtsEoaC{aGe|u@gh@qm@qi_@cf`@{n@{nn@Wr~@fla@{fE`l`@u`Frad@bqCpz{@}_a@|ugBa~AjuZ~sBtcInwY|xRt|Ynmt@t`Qd_t@~q\\f|]zka@lfs@",
-    stops: [
-      { name: "Spearfish, SD", lat: 44.4908, lng: -103.8593, note: "Depart 7:00 AM" },
-      { name: "Devils Tower National Monument, WY", lat: 44.5902, lng: -104.7146, note: "8:00 AM stop" },
-      { name: "Medora, ND (Theodore Roosevelt NP)", lat: 46.9192, lng: -103.5382, note: "Lunch + TRNP Scenic Loop" },
-      { name: "Miles City, MT", lat: 46.4083, lng: -105.8405, note: "Overnight — arrive ~3:30-4:00 PM" }
-    ]
-  },
-  {
-    id: 6, color: "#e6b800", title: "Day 6 — Miles City, MT → Missoula (quick visit) → Coeur d'Alene, ID",
-    summary: "~695 mi, ~11h driving + ~1-1.5h stop in Missoula. Second big push day.",
-    gmaps: "https://www.google.com/maps/dir/Miles+City,+MT/Billings,+MT/Bozeman,+MT/Missoula,+MT/Coeur+d'Alene,+ID",
-    route: "ecgzGb~~dSpiOh~XpgKhqv@hP|m{DtoPz{LdzFv~r@l{Rrip@nnL`sw@hea@julAtlDsP~fPlfp@paMheaAkuStry@b|BxqHmfIxl|@}lRl`\\fiRxa_At{F|sFkpB~{`@zbLzmUooCbcp@nmDdxSodg@zslAgbJ|`j@~mM|xTdoDymHjc@raFguFtpDcwOenKlgH|cuAemHfklAkyJjfH_|Dfmk@orSjrPwsu@}`OitRbbB{_f@~y{AuzDz}|AqgJjhDycQvwa@da@zjR{q[~vm@ycBlnTrnGbqPayDrvPpd@nrg@}bVxzKaxIfpOwbd@bh{A}xFtks@sqGlgMwz@ltj@k{Mtui@fJb}f@e`N~mc@eu@hda@c{GbxM",
-    stops: [
-      { name: "Miles City, MT", lat: 46.4083, lng: -105.8405, note: "Depart 7:00 AM" },
-      { name: "Billings, MT", lat: 45.7833, lng: -108.5007, note: "Gas/break" },
-      { name: "Bozeman/Butte area, MT", lat: 45.8, lng: -111.6, note: "Drive-through" },
-      { name: "Missoula, MT", lat: 46.8721, lng: -113.9940, note: "Say hi to Mollie and Dallas" },
-      { name: "Coeur d'Alene, ID", lat: 47.6777, lng: -116.7805, note: "Overnight — arrive ~6:45-7:00 PM" }
-    ]
-  },
-  {
-    id: 7, color: "#f032e6", title: "Day 7 — Fri 8/21: Coeur d'Alene, ID → Seattle, WA",
-    summary: "~295 mi, ~5h driving — lightest day of the trip. Arrival day.",
-    gmaps: "https://www.google.com/maps/dir/Coeur+d'Alene,+ID/Spokane,+WA/Vantage,+WA/Snoqualmie+Pass,+WA/Snoqualmie+Falls,+WA/Seattle,+WA",
-    route: "y__bHduwgUm_C`AedBlfb@hnHnb`@uz@|xY~dCjxJu]`aRnyKx{Yrqq@v`dAzoWfu|@bsQxrZ`Jx_e@xyCti\\~Lfbr@irB|wx@{AxjjB|oR|u[naJwoAf|A~mD{{@zJeV|mn@ehDp|ViXfme@qnKv|Mu_Nrx_@guFlpDaoF~aYplAdpNknF`oTwjGp}K}o@zuIgzLlcQayNfvHw^d}AdlEzzGsOlyMcfDflHgxBpeQiwBfoBweAhjMknCbOipGncI~uEptKmxCbqGaBv{Nq_HluSgkAxha@{`B~rC",
-    stops: [
-      { name: "Coeur d'Alene, ID", lat: 47.6777, lng: -116.7805, note: "Depart 9:00 AM" },
-      { name: "Spokane, WA", lat: 47.6588, lng: -117.4260, note: "Optional coffee stop" },
-      { name: "Vantage, WA", lat: 46.9315, lng: -119.9877, note: "Columbia River Gorge overlook, 10-15 min stop" },
-      { name: "Snoqualmie Pass", lat: 47.4234, lng: -121.4128, note: "Cross the pass" },
-      { name: "Snoqualmie Falls", lat: 47.5416, lng: -121.8377, note: "268-ft waterfall, easy viewing platform — worth the 15-20 min detour" },
-      { name: "Seattle, WA", lat: 47.6062, lng: -122.3321, note: "Arrival — ~3:00-3:30 PM" }
-    ]
   }
 ];
+
+const tripVersions = {
+  original: {
+    label: "Version 1 — Original (via Coeur d'Alene)",
+    days: [
+      ...sharedDays,
+      {
+        id: 5, color: "#911eb4", title: "Day 5 — Spearfish, SD → Devils Tower → Theodore Roosevelt NP → Miles City, MT",
+        summary: "~430 mi, ~8h driving plus stops.",
+        gmaps: "https://www.google.com/maps/dir/Spearfish,+SD/Devils+Tower+National+Monument,+WY/Theodore+Roosevelt+National+Park,+Medora,+ND/Miles+City,+MT",
+        route: "qrpnGd_|xRsrDtWifDjpTpNbx[zrB`wObvWjy_@_Jp}e@w}RhvU_cPzuDalTui[ae@oiUnvHm}QfrBibd@w_Agg|@k}a@gy@m{Wcfr@wlKklFetsBeZswE_xJym`@oeT{bdAtsEoaC{aGe|u@gh@qm@qi_@cf`@{n@{nn@Wr~@fla@{fE`l`@u`Frad@bqCpz{@}_a@|ugBa~AjuZ~sBtcInwY|xRt|Ynmt@t`Qd_t@~q\\f|]zka@lfs@",
+        stops: [
+          { name: "Spearfish, SD", lat: 44.4908, lng: -103.8593, note: "Depart 7:00 AM" },
+          { name: "Devils Tower National Monument, WY", lat: 44.5902, lng: -104.7146, note: "8:00 AM stop" },
+          { name: "Medora, ND (Theodore Roosevelt NP)", lat: 46.9192, lng: -103.5382, note: "Lunch + TRNP Scenic Loop" },
+          { name: "Miles City, MT", lat: 46.4083, lng: -105.8405, note: "Overnight — arrive ~3:30-4:00 PM" }
+        ]
+      },
+      {
+        id: 6, color: "#e6b800", title: "Day 6 — Miles City, MT → Missoula (quick visit) → Coeur d'Alene, ID",
+        summary: "~695 mi, ~11h driving + ~1-1.5h stop in Missoula. Second big push day.",
+        gmaps: "https://www.google.com/maps/dir/Miles+City,+MT/Billings,+MT/Bozeman,+MT/Missoula,+MT/Coeur+d'Alene,+ID",
+        route: "ecgzGb~~dSpiOh~XpgKhqv@hP|m{DtoPz{LdzFv~r@l{Rrip@nnL`sw@hea@julAtlDsP~fPlfp@paMheaAkuStry@b|BxqHmfIxl|@}lRl`\\fiRxa_At{F|sFkpB~{`@zbLzmUooCbcp@nmDdxSodg@zslAgbJ|`j@~mM|xTdoDymHjc@raFguFtpDcwOenKlgH|cuAemHfklAkyJjfH_|Dfmk@orSjrPwsu@}`OitRbbB{_f@~y{AuzDz}|AqgJjhDycQvwa@da@zjR{q[~vm@ycBlnTrnGbqPayDrvPpd@nrg@}bVxzKaxIfpOwbd@bh{A}xFtks@sqGlgMwz@ltj@k{Mtui@fJb}f@e`N~mc@eu@hda@c{GbxM",
+        stops: [
+          { name: "Miles City, MT", lat: 46.4083, lng: -105.8405, note: "Depart 7:00 AM" },
+          { name: "Billings, MT", lat: 45.7833, lng: -108.5007, note: "Gas/break" },
+          { name: "Bozeman/Butte area, MT", lat: 45.8, lng: -111.6, note: "Drive-through" },
+          { name: "Missoula, MT", lat: 46.8721, lng: -113.9940, note: "Say hi to Mollie and Dallas" },
+          { name: "Coeur d'Alene, ID", lat: 47.6777, lng: -116.7805, note: "Overnight — arrive ~6:45-7:00 PM" }
+        ]
+      },
+      {
+        id: 7, color: "#f032e6", title: "Day 7 — Fri 8/21: Coeur d'Alene, ID → Seattle, WA",
+        summary: "~295 mi, ~5h driving — lightest day of the trip. Arrival day.",
+        gmaps: "https://www.google.com/maps/dir/Coeur+d'Alene,+ID/Spokane,+WA/Vantage,+WA/Snoqualmie+Pass,+WA/Snoqualmie+Falls,+WA/Seattle,+WA",
+        route: "y__bHduwgUm_C`AedBlfb@hnHnb`@uz@|xY~dCjxJu]`aRnyKx{Yrqq@v`dAzoWfu|@bsQxrZ`Jx_e@xyCti\\~Lfbr@irB|wx@{AxjjB|oR|u[naJwoAf|A~mD{{@zJeV|mn@ehDp|ViXfme@qnKv|Mu_Nrx_@guFlpDaoF~aYplAdpNknF`oTwjGp}K}o@zuIgzLlcQayNfvHw^d}AdlEzzGsOlyMcfDflHgxBpeQiwBfoBweAhjMknCbOipGncI~uEptKmxCbqGaBv{Nq_HluSgkAxha@{`B~rC",
+        stops: [
+          { name: "Coeur d'Alene, ID", lat: 47.6777, lng: -116.7805, note: "Depart 9:00 AM" },
+          { name: "Spokane, WA", lat: 47.6588, lng: -117.4260, note: "Optional coffee stop" },
+          { name: "Vantage, WA", lat: 46.9315, lng: -119.9877, note: "Columbia River Gorge overlook, 10-15 min stop" },
+          { name: "Snoqualmie Pass", lat: 47.4234, lng: -121.4128, note: "Cross the pass" },
+          { name: "Snoqualmie Falls", lat: 47.5416, lng: -121.8377, note: "268-ft waterfall, easy viewing platform — worth the 15-20 min detour" },
+          { name: "Seattle, WA", lat: 47.6062, lng: -122.3321, note: "Arrival — ~3:00-3:30 PM" }
+        ]
+      }
+    ]
+  },
+  updated: {
+    label: "Version 2 — Updated (via Butte & Moscow)",
+    days: [
+      ...sharedDays,
+      {
+        id: 5, color: "#911eb4", title: "Day 5 — Wed 8/19: Spearfish, SD → Devils Tower → Miles City → Billings → Bozeman → Butte, MT",
+        summary: "~605 mi, ~9h15m driving — a long day, but it does the heavy lifting so Day 6 can be light.",
+        gmaps: "https://www.google.com/maps/dir/Spearfish,+SD/Devils+Tower+National+Monument,+WY/Miles+City,+MT/Billings,+MT/Bozeman,+MT/Butte,+MT",
+        route: "qrpnGd_|xRsrDtWifDjpTpNbx[zrB`wObvWjy_@_Jp}e@w}RhvU_cPzuDesOigVouHjkFioRm_Cs`MkoX_mWuwNqndA~kpDwrV~|c@{uc@b`IesTlnVouHbb@kys@oxVinX|s_@ih^zfUpiOh~XpgKhqv@hP|m{DtoPz{LdzFv~r@l{Rrip@nnL`sw@hea@julAtlDsP~fPlfp@laMhaaAguStvy@b|BxqHmfIxl|@omR|h\\xiRhy~@t{F|sFkpB~{`@haL~~T}mC~qp@xnDroSsgFneXi`GxwCexWttn@ehM~ho@z~Gpt|AemHfklAqiO`qR",
+        stops: [
+          { name: "Spearfish, SD", lat: 44.4908, lng: -103.8593, note: "Depart 8:00 AM" },
+          { name: "Devils Tower National Monument, WY", lat: 44.5902, lng: -104.7146, note: "9:00 AM — Tower Trail loop or quick stop" },
+          { name: "Miles City, MT", lat: 46.4083, lng: -105.8405, note: "Lunch/gas ~12:35 PM" },
+          { name: "Billings, MT", lat: 45.7833, lng: -108.5007, note: "Quick break ~3:15 PM" },
+          { name: "Bozeman, MT", lat: 45.6770, lng: -111.0429, note: "Brief stop if desired ~5:30 PM" },
+          { name: "Butte, MT", lat: 46.0038, lng: -112.5348, note: "Overnight — arrive ~7:00 PM" }
+        ]
+      },
+      {
+        id: 6, color: "#e6b800", title: "Day 6 — Thu 8/20: Butte, MT → Missoula (friends) → Lolo Pass → Moscow, ID",
+        summary: "~364 mi, ~6h45m driving + Missoula visit — genuinely light day.",
+        gmaps: "https://www.google.com/maps/dir/Butte,+MT/Missoula,+MT/Lowell,+ID/Kamiah,+ID/Moscow,+ID",
+        route: "mcxwGnmzmTai@d{`@c~KrfNazOhZ_kTqmGehR_n@szCqkCitRbbBwkDd~O{oJlhOscFlu]s}M|z[ahCj{S`dCrnFr@xwXknDheP}HvrUqgJjhDycQvwa@vtAx_Lqr@`jEb_K|cSjoIu|ArlAf~RmaCn|Odn@v~GqzC~}NhiBjmObrDhdHnaFl}@n`Dx}EddQxpDl}DvjLfxDnv@tfB~zZ|cGfkTatAd|Dz~AzoOznE`hLnUtmGftPzhc@xqR~uJnd@~sU~eOb{Mhz@r|He}At|Ml}Dl_IksD|~Irt@phF_jAdrKfeBjyC_yAd~EesKn~@m_AzvBucMnfS}s]lsPepFrpKqv@dpL`oAp}Ry`Fpya@jyCbcPxaHv{Mpc@z~NhiCjvGq\\zmLiqDenEsNpiJmmBjeCs|EoePkhNsk@gxMzaO}hKy|C",
+        stops: [
+          { name: "Butte, MT", lat: 46.0038, lng: -112.5348, note: "Depart 8:30 AM" },
+          { name: "Missoula, MT", lat: 46.8721, lng: -113.9940, note: "Say hi to friends ~10:30 AM" },
+          { name: "Lowell, ID", lat: 46.1477, lng: -115.6075, note: "Lolo Pass / US-12 waypoint" },
+          { name: "Kamiah, ID", lat: 46.2246, lng: -116.0243, note: "US-12 waypoint" },
+          { name: "Moscow, ID", lat: 46.7324, lng: -117.0002, note: "Overnight — arrive ~4:45 PM" }
+        ]
+      },
+      {
+        id: 7, color: "#f032e6", title: "Day 7 — Fri 8/21: Moscow, ID → Seattle, WA",
+        summary: "~295 mi, ~5.75h driving — north through the Palouse to Spokane, then I-90 W.",
+        gmaps: "https://www.google.com/maps/dir/Moscow,+ID/Spokane,+WA/Vantage,+WA/Snoqualmie+Falls,+WA/Seattle,+WA",
+        route: "ilf|GfrbiUg{KgZgxDb_FamDw}@avCzkHcrJ~`EqoCex@sn@zkDoiHfxD{nIiK}lIr~HhQ`nE_|J~oKkhDtqKepNxDydCvvDamn@`Ww~Pb}IanAmuCnyKx{Yrqq@v`dAzoWfu|@bsQxrZ`Jx_e@xyCti\\~Lfbr@irB|wx@{AxjjB|oR|u[naJwoAf|A~mD{{@zJeV|mn@ehDp|ViXfme@qnKv|Mu_Nrx_@guFlpDaoF~aYplAdpNknF`oTwjGp}K}o@zuIgzLlcQayNfvHw^d}AdlEzzGsOlyMcfDflHgxBpeQiwBfoBweAhjMknCbOipGncI~uEptKmxCbqGaBv{Nq_HluSgkAxha@{`B~rC",
+        stops: [
+          { name: "Moscow, ID", lat: 46.7324, lng: -117.0002, note: "Depart 9:00 AM (morning with your professor if timing works)" },
+          { name: "Spokane, WA", lat: 47.6588, lng: -117.4260, note: "~10:30 AM" },
+          { name: "Vantage, WA", lat: 46.9315, lng: -119.9877, note: "Columbia River Gorge overlook ~1:00 PM" },
+          { name: "Snoqualmie Pass", lat: 47.4234, lng: -121.4128, note: "Cross the pass ~2:30 PM" },
+          { name: "Snoqualmie Falls", lat: 47.5416, lng: -121.8377, note: "Optional stop ~3:15 PM" },
+          { name: "Seattle, WA", lat: 47.6062, lng: -122.3321, note: "Arrival ~4:00 PM" }
+        ]
+      }
+    ]
+  }
+};
 
 // Decode a Google/OSRM encoded polyline (precision 5) into [lat, lng] pairs
 function decodePolyline(str) {
@@ -224,75 +290,88 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const dayListEl = document.getElementById('day-list');
-const layerGroups = {};
-let allBounds = [];
+const versionSelect = document.getElementById('version-select');
+let currentLayerGroups = {};
 
-days.forEach(day => {
-  const group = L.layerGroup().addTo(map);
-  layerGroups[day.id] = group;
+function renderVersion(versionKey) {
+  // Clear any existing layers and sidebar cards from the previous version
+  Object.values(currentLayerGroups).forEach(g => map.removeLayer(g));
+  currentLayerGroups = {};
+  dayListEl.innerHTML = '';
 
-  const latlngs = day.stops.map(s => [s.lat, s.lng]);
-  latlngs.forEach(ll => allBounds.push(ll));
+  const days = tripVersions[versionKey].days;
+  let allBounds = [];
 
-  if (day.route) {
-    const roadPath = decodePolyline(day.route);
-    L.polyline(roadPath, { color: day.color, weight: 4, opacity: 0.85 }).addTo(group);
-  } else {
-    L.polyline(latlngs, { color: day.color, weight: 4, opacity: 0.75, dashArray: '6 6' }).addTo(group);
-  }
+  days.forEach(day => {
+    const group = L.layerGroup().addTo(map);
+    currentLayerGroups[day.id] = group;
 
-  day.stops.forEach((stop, i) => {
-    const isEndpoint = i === 0 || i === day.stops.length - 1;
-    const marker = L.circleMarker([stop.lat, stop.lng], {
-      radius: isEndpoint ? 8 : 6,
-      fillColor: day.color,
-      color: '#fff',
-      weight: isEndpoint ? 2 : 1.5,
-      fillOpacity: 0.95
-    }).addTo(group);
-    marker.bindPopup(`<b>${stop.name}</b><br>${stop.note}<br><span style="color:#93a3b3">${day.title}</span>`);
-  });
+    const latlngs = day.stops.map(s => [s.lat, s.lng]);
+    latlngs.forEach(ll => allBounds.push(ll));
 
-  const card = document.createElement('div');
-  card.className = 'day-card';
-  card.innerHTML = `
-    <div class="day-header">
-      <input type="checkbox" class="checkbox" checked data-day="${day.id}">
-      <span class="swatch" style="background:${day.color}"></span>
-      <span class="label">${day.title}</span>
-      <span class="toggle">▾</span>
-    </div>
-    <div class="day-body">
-      <div>${day.summary}</div>
-      <ul>${day.stops.map(s => `<li><b>${s.name}</b> — ${s.note}</li>`).join('')}</ul>
-      <a href="${day.gmaps}" target="_blank" rel="noopener">Open Day ${day.id} route in Google Maps ↗</a>
-    </div>
-  `;
-  dayListEl.appendChild(card);
-
-  const header = card.querySelector('.day-header');
-  const body = card.querySelector('.day-body');
-  const toggleArrow = card.querySelector('.toggle');
-  header.addEventListener('click', (e) => {
-    if (e.target.classList.contains('checkbox')) return;
-    body.classList.toggle('open');
-    toggleArrow.textContent = body.classList.contains('open') ? '▴' : '▾';
-    if (body.classList.contains('open')) {
-      map.fitBounds(day.stops.map(s => [s.lat, s.lng]), { padding: [40,40] });
-    }
-  });
-
-  const checkbox = card.querySelector('.checkbox');
-  checkbox.addEventListener('change', () => {
-    if (checkbox.checked) {
-      group.addTo(map);
+    if (day.route) {
+      const roadPath = decodePolyline(day.route);
+      L.polyline(roadPath, { color: day.color, weight: 4, opacity: 0.85 }).addTo(group);
     } else {
-      map.removeLayer(group);
+      L.polyline(latlngs, { color: day.color, weight: 4, opacity: 0.75, dashArray: '6 6' }).addTo(group);
     }
-  });
-});
 
-map.fitBounds(allBounds, { padding: [30,30] });
+    day.stops.forEach((stop, i) => {
+      const isEndpoint = i === 0 || i === day.stops.length - 1;
+      const marker = L.circleMarker([stop.lat, stop.lng], {
+        radius: isEndpoint ? 8 : 6,
+        fillColor: day.color,
+        color: '#fff',
+        weight: isEndpoint ? 2 : 1.5,
+        fillOpacity: 0.95
+      }).addTo(group);
+      marker.bindPopup(`<b>${stop.name}</b><br>${stop.note}<br><span style="color:#93a3b3">${day.title}</span>`);
+    });
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-header">
+        <input type="checkbox" class="checkbox" checked data-day="${day.id}">
+        <span class="swatch" style="background:${day.color}"></span>
+        <span class="label">${day.title}</span>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="day-body">
+        <div>${day.summary}</div>
+        <ul>${day.stops.map(s => `<li><b>${s.name}</b> — ${s.note}</li>`).join('')}</ul>
+        <a href="${day.gmaps}" target="_blank" rel="noopener">Open Day ${day.id} route in Google Maps ↗</a>
+      </div>
+    `;
+    dayListEl.appendChild(card);
+
+    const header = card.querySelector('.day-header');
+    const body = card.querySelector('.day-body');
+    const toggleArrow = card.querySelector('.toggle');
+    header.addEventListener('click', (e) => {
+      if (e.target.classList.contains('checkbox')) return;
+      body.classList.toggle('open');
+      toggleArrow.textContent = body.classList.contains('open') ? '▴' : '▾';
+      if (body.classList.contains('open')) {
+        map.fitBounds(day.stops.map(s => [s.lat, s.lng]), { padding: [40,40] });
+      }
+    });
+
+    const checkbox = card.querySelector('.checkbox');
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        group.addTo(map);
+      } else {
+        map.removeLayer(group);
+      }
+    });
+  });
+
+  map.fitBounds(allBounds, { padding: [30,30] });
+}
+
+renderVersion(versionSelect.value);
+versionSelect.addEventListener('change', () => renderVersion(versionSelect.value));
 
 // Mobile sidebar drawer toggle
 const menuBtn = document.getElementById('menu-btn');
@@ -314,12 +393,13 @@ menuBtn.addEventListener('click', () => {
 });
 backdropEl.addEventListener('click', closeSidebar);
 
-// Auto-close the drawer on mobile after picking a route from Google Maps
-if (window.matchMedia('(max-width: 768px)').matches) {
-  dayListEl.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => setTimeout(closeSidebar, 200));
-  });
-}
+// Auto-close the drawer on mobile after picking a route from Google Maps.
+// Delegated on the container so it keeps working after renderVersion() rebuilds the list.
+dayListEl.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A' && window.matchMedia('(max-width: 768px)').matches) {
+    setTimeout(closeSidebar, 200);
+  }
+});
 
 window.addEventListener('resize', () => map.invalidateSize());
 
