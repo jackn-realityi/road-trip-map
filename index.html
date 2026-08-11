@@ -24,7 +24,15 @@
   .day-header{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;user-select:none;}
   .swatch{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
   .day-header .label{flex:1;font-size:13.5px;font-weight:600;}
+  .day-header .stat{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
   .day-header .toggle{font-size:11px;color:var(--muted);}
+  #trip-totals{
+    display:flex;gap:10px;margin-bottom:14px;padding:10px 12px;border-radius:8px;
+    background:#101923;border:1px solid var(--panel-border);font-size:12.5px;
+  }
+  #trip-totals .stat-block{flex:1;text-align:center;}
+  #trip-totals .stat-value{font-size:16px;font-weight:700;color:#fff;display:block;}
+  #trip-totals .stat-label{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:0.03em;}
   .day-body{padding:0 12px 12px 34px;font-size:12.5px;color:var(--muted);display:none;}
   .day-body.open{display:block;}
   .day-body a{color:#7cc4ff;text-decoration:none;}
@@ -98,6 +106,11 @@
       <option value="original">Version 1 — Original (via Coeur d'Alene)</option>
       <option value="updated" selected>Version 2 — Updated (via Butte &amp; Moscow)</option>
     </select>
+    <div id="trip-totals">
+      <div class="stat-block"><span class="stat-value" id="total-miles">–</span><span class="stat-label">Miles</span></div>
+      <div class="stat-block"><span class="stat-value" id="total-hours">–</span><span class="stat-label">Hrs driving</span></div>
+      <div class="stat-block"><span class="stat-value" id="total-days">–</span><span class="stat-label">Days</span></div>
+    </div>
     <div id="day-list"></div>
     <div id="legend-note">Routes are traced along actual roads (via OSRM routing). Use the "Open in Google Maps" links for live turn-by-turn directions.</div>
   </div>
@@ -109,6 +122,7 @@
 const sharedDays = [
   {
     id: 1, color: "#e6194b", title: "Day 1 — Sat 8/15: Bethany, CT → Portage, IN",
+    miles: 760, hours: 12,
     summary: "~760 mi, ~12h wheel time. I-84 → I-380 → I-80 across PA/OH → I-80/90 into Indiana. Skips Pittsburgh & Chicago.",
     gmaps: "https://www.google.com/maps/dir/Bethany,+CT/Grey+Towers+National+Historic+Site,+Milford,+PA/Toledo,+OH/Portage,+IN",
     route: "scx{Fthw|La|J||a@jeKf{ItaEjk|@_f_@pp]~cEjtwAd|d@`nxB}`DdnpBwdMrnh@zoo@v~bAtpQzkAheMf~`@jvB~_oBsvP|}h@~n@ze|AnlWbk}@wuNr{b@bdKjzd@ab_@xvyAk{JtiuBpNxvdGrpMfr|@oiXnb^}kAv`sBetWjlnAj_DbfkD_y_@l_qB}sXd{N`fKrbXrOhbcCw~FrzzAixWr}{@{BdhcGnn^nbpAzbB~qz@",
@@ -121,6 +135,7 @@ const sharedDays = [
   },
   {
     id: 2, color: "#4363d8", title: "Day 2 — Sun 8/16: Portage, IN → Sioux Falls, SD",
+    miles: 705, hours: 12,
     summary: "~705 mi, ~12h driving. Bypass Chicago → WI → Mississippi crossing at La Crosse → Rochester, MN → Sioux Falls.",
     gmaps: "https://www.google.com/maps/dir/Portage,+IN/La+Crosse,+WI/Rochester,+MN/Sioux+Falls,+SD",
     route: "}zw|Ft_bsOlNutXkwFbauAgcPriFmoMtpSa}YdlFo`LngUynMndn@q{Abvw@oo^zwzAseBtua@}im@|mEqsO{uI_dkAzd^apN~na@abVliEgn_@~qZqf`@tiHk`N`yy@gzPb`BasVdcl@oiPfqOg}Tpd|@xdHnd\\uW`c_@|_Ipqb@hvAhan@j`NroJazXrka@rpCxc[m`HpqWd_Djtr@kxCrxv@eoGbqAspApcl@dlWfp@fnh@rtr@`}A~{tAkfEt_i@biG`jgAmgEpsdDriGniiAiEzxjF`_EviVxCpbeAp}JzKpMvbF",
@@ -133,6 +148,7 @@ const sharedDays = [
   },
   {
     id: 3, color: "#f58231", title: "Day 3 — Mon 8/17: Sioux Falls, SD → Rapid City, SD (via Badlands)",
+    miles: 370, hours: 6.25,
     summary: "~370 mi, ~6-6.5h incl. Badlands Loop Road. Light day.",
     gmaps: "https://www.google.com/maps/dir/Sioux+Falls,+SD/Wall,+SD/Badlands+National+Park/Rapid+City,+SD",
     route: "oxwhGxwkmQmqLrjFp\\djq@yeJt}QpLll_Cm}DliSJvxmBogJvl|CoyPh`l@mmItrjAaV|_jFvjJd~[nk@t}_Cat]vwcA~e\\{su@fxDqbCh|Kjr@gvKzpi@iuEpbDxaD|bC_bD}aCbvHstLpr@akRhoL{nIn~Aa|`@q}DluBaxA}aQgzOe_CyIqxFrCr{k@kdQtcp@suY`gl@uaF|c[g}A~mrB|`A`kWpdD}T",
@@ -148,6 +164,7 @@ const sharedDays = [
   },
   {
     id: 4, color: "#3cb44b", title: "Day 4 — Tue 8/18: Rapid City → Rushmore → Crazy Horse → Custer SP → Spearfish, SD",
+    miles: 140, hours: 3,
     summary: "~130-140 mi, ~3h driving spread across 4 stops. Light sightseeing day.",
     gmaps: "https://www.google.com/maps/dir/Rapid+City,+SD/Mount+Rushmore+National+Memorial/Crazy+Horse+Memorial/Custer+State+Park,+SD/Spearfish,+SD",
     route: "en`lGdiauRzcNjhCnsDr{Cte@dgLx{Cn`ElV`hF~wAlpD~_FmlBrOn~B`kAbo@{[do@g|B|yCdTf|D{d@lnBly@nhEu_@dtAjmFzzHtqFt|@ykBguB~jBfuBb|A`B|sF{zF_p@sdNnsAsxGol@y_C|pBc`AjA{qBkAzqBcoBxr@{dAouH|tAcnBjZ{wCgqDa~L}cDu~Ee|@m|Iw_TyBaxJmwB{lLbiAoxBvpCeQfuBmkCcE}XdxEenL|{IaqH~{JcfLlkHimG|eAkhHppG_kAdrD}wBzcBs}@l_GmaHxzL}mAnuL~mA~zEU~_G{RduEg|AdhC`QljA",
@@ -168,6 +185,7 @@ const tripVersions = {
       ...sharedDays,
       {
         id: 5, color: "#911eb4", title: "Day 5 — Spearfish, SD → Devils Tower → Theodore Roosevelt NP → Miles City, MT",
+        miles: 430, hours: 8,
         summary: "~430 mi, ~8h driving plus stops.",
         gmaps: "https://www.google.com/maps/dir/Spearfish,+SD/Devils+Tower+National+Monument,+WY/Theodore+Roosevelt+National+Park,+Medora,+ND/Miles+City,+MT",
         route: "qrpnGd_|xRsrDtWifDjpTpNbx[zrB`wObvWjy_@_Jp}e@w}RhvU_cPzuDalTui[ae@oiUnvHm}QfrBibd@w_Agg|@k}a@gy@m{Wcfr@wlKklFetsBeZswE_xJym`@oeT{bdAtsEoaC{aGe|u@gh@qm@qi_@cf`@{n@{nn@Wr~@fla@{fE`l`@u`Frad@bqCpz{@}_a@|ugBa~AjuZ~sBtcInwY|xRt|Ynmt@t`Qd_t@~q\\f|]zka@lfs@",
@@ -180,6 +198,7 @@ const tripVersions = {
       },
       {
         id: 6, color: "#e6b800", title: "Day 6 — Miles City, MT → Missoula (quick visit) → Coeur d'Alene, ID",
+        miles: 695, hours: 11,
         summary: "~695 mi, ~11h driving + ~1-1.5h stop in Missoula. Second big push day.",
         gmaps: "https://www.google.com/maps/dir/Miles+City,+MT/Billings,+MT/Bozeman,+MT/Missoula,+MT/Coeur+d'Alene,+ID",
         route: "ecgzGb~~dSpiOh~XpgKhqv@hP|m{DtoPz{LdzFv~r@l{Rrip@nnL`sw@hea@julAtlDsP~fPlfp@paMheaAkuStry@b|BxqHmfIxl|@}lRl`\\fiRxa_At{F|sFkpB~{`@zbLzmUooCbcp@nmDdxSodg@zslAgbJ|`j@~mM|xTdoDymHjc@raFguFtpDcwOenKlgH|cuAemHfklAkyJjfH_|Dfmk@orSjrPwsu@}`OitRbbB{_f@~y{AuzDz}|AqgJjhDycQvwa@da@zjR{q[~vm@ycBlnTrnGbqPayDrvPpd@nrg@}bVxzKaxIfpOwbd@bh{A}xFtks@sqGlgMwz@ltj@k{Mtui@fJb}f@e`N~mc@eu@hda@c{GbxM",
@@ -193,6 +212,7 @@ const tripVersions = {
       },
       {
         id: 7, color: "#f032e6", title: "Day 7 — Fri 8/21: Coeur d'Alene, ID → Seattle, WA",
+        miles: 295, hours: 5,
         summary: "~295 mi, ~5h driving — lightest day of the trip. Arrival day.",
         gmaps: "https://www.google.com/maps/dir/Coeur+d'Alene,+ID/Spokane,+WA/Vantage,+WA/Snoqualmie+Pass,+WA/Snoqualmie+Falls,+WA/Seattle,+WA",
         route: "y__bHduwgUm_C`AedBlfb@hnHnb`@uz@|xY~dCjxJu]`aRnyKx{Yrqq@v`dAzoWfu|@bsQxrZ`Jx_e@xyCti\\~Lfbr@irB|wx@{AxjjB|oR|u[naJwoAf|A~mD{{@zJeV|mn@ehDp|ViXfme@qnKv|Mu_Nrx_@guFlpDaoF~aYplAdpNknF`oTwjGp}K}o@zuIgzLlcQayNfvHw^d}AdlEzzGsOlyMcfDflHgxBpeQiwBfoBweAhjMknCbOipGncI~uEptKmxCbqGaBv{Nq_HluSgkAxha@{`B~rC",
@@ -213,6 +233,7 @@ const tripVersions = {
       ...sharedDays,
       {
         id: 5, color: "#911eb4", title: "Day 5 — Wed 8/19: Spearfish, SD → Devils Tower → Miles City → Billings → Bozeman → Butte, MT",
+        miles: 605, hours: 9.25,
         summary: "~605 mi, ~9h15m driving — a long day, but it does the heavy lifting so Day 6 can be light.",
         gmaps: "https://www.google.com/maps/dir/Spearfish,+SD/Devils+Tower+National+Monument,+WY/Miles+City,+MT/Billings,+MT/Bozeman,+MT/Butte,+MT",
         route: "qrpnGd_|xRsrDtWifDjpTpNbx[zrB`wObvWjy_@_Jp}e@w}RhvU_cPzuDesOigVouHjkFioRm_Cs`MkoX_mWuwNqndA~kpDwrV~|c@{uc@b`IesTlnVouHbb@kys@oxVinX|s_@ih^zfUpiOh~XpgKhqv@hP|m{DtoPz{LdzFv~r@l{Rrip@nnL`sw@hea@julAtlDsP~fPlfp@laMhaaAguStvy@b|BxqHmfIxl|@omR|h\\xiRhy~@t{F|sFkpB~{`@haL~~T}mC~qp@xnDroSsgFneXi`GxwCexWttn@ehM~ho@z~Gpt|AemHfklAqiO`qR",
@@ -227,6 +248,7 @@ const tripVersions = {
       },
       {
         id: 6, color: "#e6b800", title: "Day 6 — Thu 8/20: Butte, MT → Missoula (friends) → Lolo Pass → Moscow, ID",
+        miles: 364, hours: 6.75,
         summary: "~364 mi, ~6h45m driving + Missoula visit — genuinely light day.",
         gmaps: "https://www.google.com/maps/dir/Butte,+MT/Missoula,+MT/Lowell,+ID/Kamiah,+ID/Moscow,+ID",
         route: "mcxwGnmzmTai@d{`@c~KrfNazOhZ_kTqmGehR_n@szCqkCitRbbBwkDd~O{oJlhOscFlu]s}M|z[ahCj{S`dCrnFr@xwXknDheP}HvrUqgJjhDycQvwa@vtAx_Lqr@`jEb_K|cSjoIu|ArlAf~RmaCn|Odn@v~GqzC~}NhiBjmObrDhdHnaFl}@n`Dx}EddQxpDl}DvjLfxDnv@tfB~zZ|cGfkTatAd|Dz~AzoOznE`hLnUtmGftPzhc@xqR~uJnd@~sU~eOb{Mhz@r|He}At|Ml}Dl_IksD|~Irt@phF_jAdrKfeBjyC_yAd~EesKn~@m_AzvBucMnfS}s]lsPepFrpKqv@dpL`oAp}Ry`Fpya@jyCbcPxaHv{Mpc@z~NhiCjvGq\\zmLiqDenEsNpiJmmBjeCs|EoePkhNsk@gxMzaO}hKy|C",
@@ -240,6 +262,7 @@ const tripVersions = {
       },
       {
         id: 7, color: "#f032e6", title: "Day 7 — Fri 8/21: Moscow, ID → Seattle, WA",
+        miles: 295, hours: 5.75,
         summary: "~295 mi, ~5.75h driving — north through the Palouse to Spokane, then I-90 W.",
         gmaps: "https://www.google.com/maps/dir/Moscow,+ID/Spokane,+WA/Vantage,+WA/Snoqualmie+Falls,+WA/Seattle,+WA",
         route: "ilf|GfrbiUg{KgZgxDb_FamDw}@avCzkHcrJ~`EqoCex@sn@zkDoiHfxD{nIiK}lIr~HhQ`nE_|J~oKkhDtqKepNxDydCvvDamn@`Ww~Pb}IanAmuCnyKx{Yrqq@v`dAzoWfu|@bsQxrZ`Jx_e@xyCti\\~Lfbr@irB|wx@{AxjjB|oR|u[naJwoAf|A~mD{{@zJeV|mn@ehDp|ViXfme@qnKv|Mu_Nrx_@guFlpDaoF~aYplAdpNknF`oTwjGp}K}o@zuIgzLlcQayNfvHw^d}AdlEzzGsOlyMcfDflHgxBpeQiwBfoBweAhjMknCbOipGncI~uEptKmxCbqGaBv{Nq_HluSgkAxha@{`B~rC",
@@ -283,6 +306,13 @@ function decodePolyline(str) {
   return coordinates;
 }
 
+// Format decimal hours like "57.25" as "57h 15m" for display
+function formatHours(totalHours) {
+  const h = Math.floor(totalHours);
+  const m = Math.round((totalHours - h) * 60);
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+
 const map = L.map('map', { zoomControl: true }).setView([43.5, -98], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 18,
@@ -301,6 +331,12 @@ function renderVersion(versionKey) {
 
   const days = tripVersions[versionKey].days;
   let allBounds = [];
+
+  const totalMiles = days.reduce((sum, d) => sum + (d.miles || 0), 0);
+  const totalHours = days.reduce((sum, d) => sum + (d.hours || 0), 0);
+  document.getElementById('total-miles').textContent = totalMiles.toLocaleString();
+  document.getElementById('total-hours').textContent = formatHours(totalHours);
+  document.getElementById('total-days').textContent = days.length;
 
   days.forEach(day => {
     const group = L.layerGroup().addTo(map);
@@ -335,6 +371,7 @@ function renderVersion(versionKey) {
         <input type="checkbox" class="checkbox" checked data-day="${day.id}">
         <span class="swatch" style="background:${day.color}"></span>
         <span class="label">${day.title}</span>
+        <span class="stat">${day.miles ? `${day.miles} mi · ${formatHours(day.hours)}` : ''}</span>
         <span class="toggle">▾</span>
       </div>
       <div class="day-body">
