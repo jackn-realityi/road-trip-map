@@ -105,6 +105,7 @@
     <select id="version-select">
       <option value="original">Version 1 — Original (via Coeur d'Alene)</option>
       <option value="updated" selected>Version 2 — Updated (via Butte &amp; Moscow)</option>
+      <option value="actual">Version 3 — Actual (real GPS track)</option>
     </select>
     <div id="trip-totals">
       <div class="stat-block"><span class="stat-value" id="total-miles">–</span><span class="stat-label">Miles</span></div>
@@ -112,7 +113,7 @@
       <div class="stat-block"><span class="stat-value" id="total-days">–</span><span class="stat-label">Days</span></div>
     </div>
     <div id="day-list"></div>
-    <div id="legend-note">Routes are traced along actual roads (via OSRM routing). Use the "Open in Google Maps" links for live turn-by-turn directions.</div>
+    <div id="legend-note">Versions 1 & 2 are planned routes traced along roads (via OSRM routing). Version 3 is a real GPS track pulled from a Google Timeline export. Use the "Open in Google Maps" links for live turn-by-turn directions.</div>
   </div>
   <div id="map"></div>
 </div>
@@ -174,6 +175,90 @@ const sharedDays = [
       { name: "Crazy Horse Memorial", lat: 43.8375, lng: -103.6206, note: "~$15-30/person, private nonprofit" },
       { name: "Custer State Park", lat: 43.7566, lng: -103.4257, note: "~$20/vehicle 7-day pass — Wildlife Loop Rd, picnic lunch" },
       { name: "Spearfish, SD", lat: 44.4908, lng: -103.8593, note: "Overnight — arrive ~3:00 PM" }
+    ]
+  }
+];
+
+// Real GPS track pulled from a Google Timeline export (semanticSegments), covering the
+// actual trip so far. Grouped into 5 "legs" split at each overnight stop, mirroring the
+// planned-day structure so it can be compared directly against Versions 1 and 2 above.
+const actualLegs = [
+  {
+    id: 1, color: "#00bcd4", title: "Leg 1 — Bethany, CT → Bloomington, IL",
+    miles: 923.9, hours: 16.39,
+    summary: "Actual GPS track: 923.9 mi, 16h 23m of real driving time. No overnight stop in Portage, IN — pushed on to Bloomington, IL instead.",
+    gmaps: "https://www.google.com/maps/dir/41.44971,-73.03001/40.92279,-88.64207",
+    route: "us~{Fptv|LhWte@zZ~InNtVnKdeAyBfe@y]lPGn@r\\yM`d@rSb\\bi@wEruAgb@jQuJ`\\bB~a@|VRtBvj@uM|aAaZlc@uN|o@}yC|rEgfA`cFZdaAyEbSpjDbbFzeAeG|yBf|AhSvrAoOr}AmeAneDzg@boGcLhyAr~@duF}T|cAzj@nwDz[|BbK~BpDvNwGnQtLzIhXpaA~w@fK`e@vk@_s@z{Hvq@~iH}[bdA{uGhgFyuHntCu`KtxJ}Sto@c@nOcC`lAnrBluLuNr`Dxp@tpDhEpeHed@npAhDp~DtcAbkC~BzcKzTdcAuw@hkIb|@f`Dk\\jxJ`lFlrSvaAjzCbi@lgD|`I|xP~e@~yDqQrvDvgBboLnk@xlAz}@vxFlAjhCdyBhsFua@pfDhqBfhLiRpfAt^neId^`{@lCp}@omBffS{D`sApZzkDq[lxDoa@dmAwHfcJqq@dwFj~AjgR|e@joHp`@jpAmRdtD_`Al|CvB|oD|YxmAgv@zmDyo@hbAgY|nAuyBhcB_gBtpF_A|yAt`A~hDpeBztB`YpaA}r@lp@ucA~NwyCn~BxHrr@|k@jt@dY``Anc@ha@ldBfcDxx@lk@pt@hvC~fBniErqBfiAxx@cEbk@ps@lRrkAtbJxbKpW~c@sEr_A`C}YfHthAv@wOYgGeDkhAxM_g@rb@`i@d}Bv|HzlF`pGl|@xvD`pQxtApi@psAr}@hx@jeFpvPhCf}Az`CjiIOv`B}fA|a@aNlyAz}@rkMoc@zxG{bC`jF{RvzAnuA`vJeOv|AzdC`zRmG|}A|d@~vDxCtbF~PrxDva@pjA~b@lkKklD`kLmhDlfD}tAx`Mg}BnpFyKvaBlbAz~Wl~C|hLsj@r}@kWviA}BbInYtn[mqGl}LxcLtgc@~uEhyJlmEfdKixHb|RoxAbb\\ybFrgKvjLbq`@a~AlcTmfErpVvLxVIj@_Ns]_eI`vUwbEduTytCzab@kn@noMbuAlqQmiErgPi_A~kZlAvvV_zAncSfYrwe@vnBvzRukC~d[_NxnScc@iX_ABf_AtxNaIvuY~uAnkm@~jAzsXldAntSpdAj{EfnHtlMgaWhsb@saC|ti@uZhqe@cdEzps@qzF`mY_cFx}TamCrsU{dAruSbWr\\lz@^cBvO@@qoAmn@{CzaZbxInrSzbA~hb@hNfzMemB`vH{_@jrW_yA`rWceC|xR{uDzgWkfFnoUewFthS}}FvyS_jDz~OyhE|gMy^nxQcx@prTlGbzR|TraOnXxkA{H|{UpRv}UFraPonArcFuIzoBBtHe[||Suj@d_WcpA|xVnEb_H_WbtAmcBtiC_fAvNeqFpqLkhCzeHu|AlpBsEblDedAbmCmq@p~UbWnrVf{@fr@`MhxAef@tfFmo@vcRfq@lcUsn@deGbg@p|UvpBdzLec@hjAf]vaUoQ~kTk@tDyCbiShCrmD~eB|aF@hpJyd@dwCv@znDkp@`~CwIhlLcrAtmCwSpqAoNnmDe]hnAxwCn`SjZdtA~KboDr|H~fM|LdiGnsB|xHloDpxEv_ChpJ~m@np@bmCntRk`@``T`KvbGt_@z|@oEpyCqb@lw@aErdAeYp}@gn@ww@wXo@yN`HzAlQuKvDnIwEwC{X{UyH~`@hbFfwDbjR{KdsTkNruGnMwGkK_ULnEzJtM}IpJCc@tIoG{SbVe]rxNsCpzQbz@viPbdD|pVhUbeRjb@hvDj}AloAd]`_ApKt|TnNlqAvyB~_F|m@y[zvC|eF`wUpx@ffWtfQ~jFhiBldPfuVleMhiRhfNvpGvrBp_K",
+    stops: [
+      { name: "Bethany, CT (home)", lat: 41.44971, lng: -73.03001, note: "Depart 5:56 AM" },
+      { name: "Bloomington, IL", lat: 40.92279, lng: -88.64207, note: "Arrive 1:16 AM" }
+    ]
+  },
+  {
+    id: 2, color: "#ff5722", title: "Leg 2 — Bloomington, IL → Sioux Falls, SD",
+    miles: 616.8, hours: 9.72,
+    summary: "Actual GPS track: 616.8 mi, 9h 43m of real driving time. Back on schedule — arrived Sioux Falls as planned.",
+    gmaps: "https://www.google.com/maps/dir/40.871,-88.66842/41.61786,-90.78163/43.60145,-96.76721",
+    route: "wrmxFr`e|O}AmQl@zWmHuQpAt{PhHbnTxKfnTfDteI}qB~Nme@laA{y@~X_x@Jc@~j@cbQ|GqeF\\m_A`q@apH|S_aAhm@yeRxOmdR|`@iiKi|CzK`UwY~}Dbb@|mVkpE`_SlCr~Wtb@jjKt_@vyAa^hrFYXjVjnTxThjUqyBtsWobAxtDdDfdBlm@`oAlSn}Dg_AbsWy|Ch|IbBxjXu@xqAmh@vv@{uNnu@}xCJkbAj^qk@zgAu|BroAi\\|lA{Gf{Xc_@xaX{pArbX{Ud|@j@mBiHpHx~Al|XmlFvd\\_wC~ac@o}Anox@ce@|_c@_Atge@r{C~mRikErnf@oDhZVq@yFf_Xnw@blY}o@hvn@brAdu^cA`r_@_Vjcg@xgD|`m@~vC|s[y`BznSve@liB~kJjyA~fEpyV~eBn~Rv{BvfRrO|xUj}Brij@eDriU_EpW~DqWyDxWxDyWwD|WoZ~iMd_@~oZjKtw]}_RbvU~qQl{e@bBdhv@oQn`b@xa@pvWoIp_Iqb@iD~LqCi@Ae@`U}L?dq@wFhyNh|DqzEenJ_da@~cZ{lgAraR`EnLeyEnwAgAmC|HfGidP`gLwr|@lka@y`LfiNoMdnFobGv~AolSfoWslErhJmy]dsSwaYfSuieA}tC{{GvpD}mOeImvAzG_jQsxBasBm_AgoBaGlKyB",
+    stops: [
+      { name: "Bloomington, IL", lat: 40.871, lng: -88.66842, note: "Depart 8:30 AM" },
+      { name: "Davenport, IA area", lat: 41.61786, lng: -90.78163, note: "11:11 AM–12:00 PM (48 min)" },
+      { name: "Sioux Falls, SD", lat: 43.60145, lng: -96.76721, note: "Arrive 8:01 PM" }
+    ]
+  },
+  {
+    id: 3, color: "#8bc34a", title: "Leg 3 — Sioux Falls, SD → Rapid City, SD",
+    miles: 409.9, hours: 7.51,
+    summary: "Actual GPS track: 409.9 mi, 7h 31m of real driving time. Squeezed in a same-day Mount Rushmore stop that was planned for Day 4.",
+    gmaps: "https://www.google.com/maps/dir/43.60424,-96.76611/43.80793,-99.3276/43.99292,-102.24152/43.88034,-103.45377/43.9349,-103.56587",
+    route: "omciGdsrmQao@jzB~Ahq_@qlPpdl@huE~cBzCvqs@hQrqe@ixElzcAkk@xCnNjFdAxb@sCpO{oA{WdDzB~@~QpkAxJkApm@UpAh@he@v]xKf]`|BrSuyCcVnkmAocDfav@ijBr}k@ubEphcAk|Fju@p@`lAoAz@rkA~{A{oUvveDqb@dlVzbDhtdAbK~dj@p_IrlzBbV`ihA^uAptFbb@nr@eUxHuMsGnL`~@dv@nr@b_Bfa@fEbFbBOzz@|`@cFpU_O~KcPjBl\\z@le@J`CtFpTug@l{AkS~rA`Ati@pQbh@qDjk@ap@fgAy\\rJcI{[c]oDm^x]eRlp@a_@l^wOrk@~Cpg@y]r^lBlc@iLzj@yYxOJpg@x^nFz]n~CiBl_AasAnpFGG{_@de@sX`sCay@|y@opAlLaWro@s`@vYIx]pHxQ{Edo@uh@v~@ks@`[cSnZiYzPx@rNeRxPv@d@_PlMyGhQxOzgAkt@js@oHx[{s@v~@cFz]ya@d_@mn@xzAX|b@sFx\\K~^~PtJzFzZ}Lzi@eAx^kNv\\mRrHc}IeCkAwbMwA{eDkmCdGmTfIeAR}wVxxaDreFhjM|_AvvApuAb[zsEhcOntGzvNteL`zSttBylAvNpkA{Bnj@p^dLvMfYpVhJ_FrPnA{J~IjBqIji@iZlJyWxWuf@rmAw`@jJ_UbcBfBfv@rU|u@c_@|hB~\\xiD|Urm@sUtn@x@xt@fSbd@sb@nY{dDsjAwO{^am@qMeBal@",
+    stops: [
+      { name: "Sioux Falls, SD", lat: 43.60424, lng: -96.76611, note: "Depart 7:34 AM" },
+      { name: "Chamberlain, SD (Missouri River)", lat: 43.80793, lng: -99.3276, note: "10:37 AM–10:57 AM (19 min)" },
+      { name: "Big Badlands Overlook", lat: 43.83391, lng: -101.90043, note: "12:53 PM–1:05 PM (11 min)" },
+      { name: "Badlands Loop Rd", lat: 43.78478, lng: -101.90025, note: "1:11 PM–1:24 PM (12 min)" },
+      { name: "Panorama Point, Badlands", lat: 43.74906, lng: -101.94169, note: "1:45 PM–2:05 PM (19 min)" },
+      { name: "Badlands (east side)", lat: 43.80368, lng: -102.13664, note: "2:28 PM–2:35 PM (6 min)" },
+      { name: "Yellow Mounds Overlook", lat: 43.86965, lng: -102.23314, note: "2:50 PM–3:00 PM (9 min)" },
+      { name: "Wall, SD (Wall Drug)", lat: 43.99292, lng: -102.24152, note: "3:40 PM–4:39 PM (59 min)" },
+      { name: "Mount Rushmore", lat: 43.88034, lng: -103.45377, note: "5:59 PM–7:42 PM (103 min)" },
+      { name: "Rapid City, SD (hotel)", lat: 43.9349, lng: -103.56587, note: "Arrive 8:09 PM" }
+    ]
+  },
+  {
+    id: 4, color: "#ffc107", title: "Leg 4 — Rapid City, SD → Billings, MT",
+    miles: 438.2, hours: 8.83,
+    summary: "Actual GPS track: 438.2 mi, 8h 50m of real driving time. Combined the planned Day 4 sightseeing with a big chunk of Day 5 — skipped the Spearfish overnight entirely.",
+    gmaps: "https://www.google.com/maps/dir/43.93534,-103.56672/43.83662,-103.6234/43.76729,-103.59515/44.59021,-104.71462/45.75578,-108.53882",
+    route: "{bdkG~zbwRjCp^bMpMb]lEpj@pw@`|Bb{@pi@yY|h@dMxHvz@bZzu@dtHb_EvdAmCuLcS}b@s]sJmS_g@s_@lo@xu@ko@yu@r]ba@hTbRB@djAtr@zu@lAzbEwoDlYex@|`@gPqYetLyLu_@|x@udG|Rsa@sNckA_\\_}@yEksAag@_sAfEuf@iNy\\}@si@nHc^iLkVb^kf@`SoFfL{h@hNgMxRetA`k@oW|Qe]xQcMd`SlNqtL|gV~aI}eVtfBwNdTpGdVhb@bA|[m`AliEeYjJgRr[qGd_@}PjNfJdFwHte@qQr_@}rDncEio@tQuQxXeLhn@qw@vJ_Ddv@sw@nT}YaLeEsWwg@sTiV_a@}r@gL_PtBxCve@eSyDgX`E{NwOm|@dvCaNlfChU`q@}Ih{@|W`jIg@gJt^vyCj|DtjJbCvzAq`@l~Cw`@tbAltAb{V|LfoAg}Tdez@yz@zeJgOrRLziCekIb}Psm@z`AatJ`yKcrHttToxEzpHwbChmAw|FrnLedIhfRkiHtbS{cClrEkn@tuDknBlgCK|JgJjTorC}pAs`A}rCowDdOqz@ta@w_AeHk}C}kD_~HifDsc@mo@qi@{vFyw@tPc|CuhBym@hMyh@_^wmAi`FaAiqFif@icAnPq{Cq_C_Hob@_g@goBiXujG~yBJdUda@r_AhGzo@gR~b@ou@sFa@qb@tTpD|CGy[gBvDxb@v{@e@nIeb@cPocAeUaVe@}VjLoWt]eFwcAk~AskDnMok@{q@yW{{CmeGqlHqUc@{]lhBkj@~f@adFbvAi[o`Aaw@eSue@y~@ikBqWuyJpr@s`DquCkVksDwqAkzFex@si@g{Bih@Lq|AkXcbAs{BacAef@cjAohNwjIcoB}VezDr_IetGpdRmgFtzVgvGh{UioGxcRqhAhgKsnIb|SebGnjV_rGrnUcvHjfRgA|Ee|@n`AobAfE@rw@s~DxuNu}@noV}qEjjUixDr|VmnA`zWu}@htDxNhgX|@jrHqlDzjON~CbSznBwFzdAinDvoTyU||Gmk@jbDo[jhTjkBttPgCpvAwhAd{F~bFf|Q`c@``@juH|nSfk@hs@tf@~aCqGr_Wxr@|pJ}m@xmDjI|kDm|BndVepE|kTUb[_BcWr@jVvAlCmR`e@ygLvkC}jNb`OgcBxkD`Af`XkVtiXuuB`{IwL|yDagAfjDqQj`Yli@poQgnDbpXy`@~xAmr@`bA{q@hhJh_GvcOdiC|k@dt@z}@tOvyDwIrh@wIzS",
+    stops: [
+      { name: "Rapid City, SD (hotel)", lat: 43.93534, lng: -103.56672, note: "Depart 8:20 AM" },
+      { name: "Crazy Horse Memorial", lat: 43.83662, lng: -103.6234, note: "8:39 AM–10:26 AM (107 min)" },
+      { name: "Custer State Park", lat: 43.76729, lng: -103.59515, note: "12:19 PM–12:39 PM (20 min)" },
+      { name: "Sundance, WY area", lat: 44.26396, lng: -104.94456, note: "2:08 PM–2:28 PM (20 min)" },
+      { name: "Devils Tower National Monument", lat: 44.59021, lng: -104.71462, note: "3:09 PM–3:39 PM (29 min)" },
+      { name: "Broadus, MT", lat: 45.42182, lng: -105.397, note: "5:21 PM–5:29 PM (7 min)" },
+      { name: "Miles City, MT area", lat: 45.59514, lng: -106.27482, note: "6:14 PM–6:24 PM (10 min)" },
+      { name: "Forsyth/Hardin, MT area", lat: 45.57911, lng: -107.44722, note: "7:27 PM–7:35 PM (7 min)" },
+      { name: "Billings, MT", lat: 45.75578, lng: -108.53882, note: "Arrive 9:07 PM" }
+    ]
+  },
+  {
+    id: 5, color: "#607d8b", title: "Leg 5 — Billings, MT → Wallace, ID (current)",
+    miles: 439.4, hours: 7.68,
+    summary: "Actual GPS track: 439.4 mi, 7h 41m of real driving time. Took I-90 straight through — not the Lolo Pass/Moscow route from Version 2.",
+    gmaps: "https://www.google.com/maps/dir/45.75448,-108.53785/45.67166,-111.0516/46.01124,-112.51833/46.87196,-113.99625/47.47256,-115.92581",
+    route: "olgvGpxmuSdKvG~i@xgFrbHptQvkFfhS{^~xCFDnM}H`pDrzUpdEvyVfs@beHgsAl}NocHz|Rab@d{J{kE`cGgf@dbBdHzlBxfBjkDg~@p}Hm{@`jAyc@`aBfLvqIe^tiBrXriBymDppVTl`FkhMv}Ri{CzjGlp@`mMjyJtyVnzEbhZnjBdfDngAoMtl@d_A_}Bf|Z|[n~EfpKrzT{{BrhWxm@f{Pa`AtnDt@joBz\\fiBtx@rnAlsAviJy{@jqDyWv]bCtwBiV`lAgCn`IqSjaAPblAk}@M_BsCiCdEmm@xD_lAuc@yVxD}a@rt@kiA~c@u~IrgWekCrjCs{JziYuyDlaPiGbpByj@dwAykAlnMy~@bjAkc@jfB{HdmEu@sHpK~i@jUf{Zl~E~|XpQ|`Bih@~hAfqAfyGah@d|Ih\\lrD{sBzpWovCfiVdj@j`GiY|i@m~@z|SqhG|~Eaz@hO_n@vy@jFbdBs]~f@qLh@iq@lYai@sD_LlPwe@fSsC`EbNmGeO~E_ApFLflAvApl@hi@^fHvaCmm@dyXwClhBipBteCoeAze@_jFfuHk`PlUclR_qFqoV_mDwsa@ru^ewG`dXwgJbtW_kFp{f@u@wFaaAzs`@ucCfnb@u_FdgAmtRz{l@pH`fGaLtk@r@hVeBoMYfHjNpzBgfIjwIytF~}LgmIdwOwjAvlMvyEplZsjAf_ZwpLpvb@ikTtfTskSxzg@{fPvvq@oeObycAutCzfi@b~@~YsAdfAi@mEdDkIPrCMpF",
+    stops: [
+      { name: "Billings, MT", lat: 45.75448, lng: -108.53785, note: "Depart 8:11 AM" },
+      { name: "Laurel, MT", lat: 45.66596, lng: -108.7998, note: "8:28 AM–8:39 AM (10 min)" },
+      { name: "Bozeman, MT", lat: 45.67166, lng: -111.0516, note: "10:32 AM–11:04 AM (32 min)" },
+      { name: "Whitehall, MT area", lat: 45.92003, lng: -111.59879, note: "11:38 AM–11:44 AM (6 min)" },
+      { name: "Butte, MT", lat: 46.01124, lng: -112.51833, note: "12:35 PM–12:59 PM (24 min)" },
+      { name: "Drummond/Bearmouth, MT", lat: 46.70307, lng: -113.34558, note: "2:08 PM–2:23 PM (15 min)" },
+      { name: "Missoula, MT", lat: 46.87196, lng: -113.99625, note: "3:03 PM–4:51 PM (107 min)" },
+      { name: "Wallace, ID", lat: 47.47297, lng: -115.92669, note: "7:04 PM–7:33 PM (28 min)" },
+      { name: "Wallace, ID", lat: 47.47256, lng: -115.92581, note: "Arrive 12:22 AM — most recent GPS point" }
     ]
   }
 ];
@@ -276,6 +361,10 @@ const tripVersions = {
         ]
       }
     ]
+  },
+  actual: {
+    label: "Version 3 — Actual (real GPS track)",
+    days: actualLegs
   }
 };
 
