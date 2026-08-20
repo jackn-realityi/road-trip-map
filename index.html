@@ -16,10 +16,18 @@
   #sidebar h1{font-size:17px;margin:0 0 4px;}
   #sidebar .sub{color:var(--muted);font-size:12.5px;margin-bottom:14px;}
   #version-select{
-    width:100%;margin-bottom:14px;padding:10px 12px;border-radius:8px;
+    width:100%;margin-bottom:8px;padding:10px 12px;border-radius:8px;
     background:#101923;color:var(--text);border:1px solid var(--panel-border);
     font-size:13px;font-weight:600;
   }
+  #copy-link-btn{
+    width:100%;margin-bottom:14px;padding:8px 12px;border-radius:8px;
+    background:#101923;color:var(--muted);border:1px solid var(--panel-border);
+    font-size:12px;cursor:pointer;text-align:center;
+    transition:background 0.15s, color 0.15s;
+  }
+  #copy-link-btn:hover{background:#1a2733;color:var(--text);}
+  #copy-link-btn.copied{color:#3cb44b;border-color:#3cb44b;}
   .day-card{border:1px solid var(--panel-border);border-radius:10px;margin-bottom:10px;overflow:hidden;background:#101923;}
   .day-header{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;user-select:none;}
   .swatch{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
@@ -107,6 +115,7 @@
       <option value="updated" selected>Version 2 — Updated (via Butte &amp; Moscow)</option>
       <option value="actual">Version 3 — Actual (real GPS track)</option>
     </select>
+    <button id="copy-link-btn">🔗 Copy link to this version</button>
     <div id="trip-totals">
       <div class="stat-block"><span class="stat-value" id="total-miles">–</span><span class="stat-label">Miles</span></div>
       <div class="stat-block"><span class="stat-value" id="total-hours">–</span><span class="stat-label">Hrs driving</span></div>
@@ -496,8 +505,51 @@ function renderVersion(versionKey) {
   map.fitBounds(allBounds, { padding: [30,30] });
 }
 
-renderVersion(versionSelect.value);
-versionSelect.addEventListener('change', () => renderVersion(versionSelect.value));
+// Deep-linkable versions: ?v=original / ?v=updated / ?v=actual
+const urlParams = new URLSearchParams(window.location.search);
+const requestedVersion = urlParams.get('v');
+const initialVersion = (requestedVersion && tripVersions[requestedVersion])
+  ? requestedVersion
+  : versionSelect.value;
+versionSelect.value = initialVersion;
+
+function setVersionInUrl(versionKey) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('v', versionKey);
+  history.replaceState(null, '', url);
+}
+
+renderVersion(initialVersion);
+setVersionInUrl(initialVersion);
+
+versionSelect.addEventListener('change', () => {
+  renderVersion(versionSelect.value);
+  setVersionInUrl(versionSelect.value);
+});
+
+// Copy-link button — copies the current URL (with ?v= for the selected version) to the clipboard
+const copyLinkBtn = document.getElementById('copy-link-btn');
+copyLinkBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+  } catch (e) {
+    // Clipboard API unavailable (e.g. non-HTTPS) — fall back to a manual-select trick
+    const ta = document.createElement('textarea');
+    ta.value = window.location.href;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  copyLinkBtn.textContent = '✓ Link copied!';
+  copyLinkBtn.classList.add('copied');
+  setTimeout(() => {
+    copyLinkBtn.textContent = '🔗 Copy link to this version';
+    copyLinkBtn.classList.remove('copied');
+  }, 1800);
+});
 
 // Mobile sidebar drawer toggle
 const menuBtn = document.getElementById('menu-btn');
