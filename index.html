@@ -113,7 +113,7 @@
     <select id="version-select">
       <option value="original">Version 1 — Original (via Coeur d'Alene)</option>
       <option value="updated" selected>Version 2 — Updated (via Butte &amp; Moscow)</option>
-      <option value="actual">Version 3 — Actual (real GPS track)</option>
+      <option value="actual">Version 3 — Actual (real GPS track) ✓ Complete</option>
     </select>
     <button id="copy-link-btn">🔗 Copy link to this version</button>
     <div id="trip-totals">
@@ -211,7 +211,7 @@ const actualLegs = [
     route: "wrmxFr`e|O}AmQl@zWmHuQpAt{PhHbnTxKfnTfDteI}qB~Nme@laA{y@~X_x@Jc@~j@cbQ|GqeF\\m_A`q@apH|S_aAhm@yeRxOmdR|`@iiKi|CzK`UwY~}Dbb@|mVkpE`_SlCr~Wtb@jjKt_@vyAa^hrFYXjVjnTxThjUqyBtsWobAxtDdDfdBlm@`oAlSn}Dg_AbsWy|Ch|IbBxjXu@xqAmh@vv@{uNnu@}xCJkbAj^qk@zgAu|BroAi\\|lA{Gf{Xc_@xaX{pArbX{Ud|@j@mBiHpHx~Al|XmlFvd\\_wC~ac@o}Anox@ce@|_c@_Atge@r{C~mRikErnf@oDhZVq@yFf_Xnw@blY}o@hvn@brAdu^cA`r_@_Vjcg@xgD|`m@~vC|s[y`BznSve@liB~kJjyA~fEpyV~eBn~Rv{BvfRrO|xUj}Brij@eDriU_EpW~DqWyDxWxDyWwD|WoZ~iMd_@~oZjKtw]}_RbvU~qQl{e@bBdhv@oQn`b@xa@pvWoIp_Iqb@iD~LqCi@Ae@`U}L?dq@wFhyNh|DqzEenJ_da@~cZ{lgAraR`EnLeyEnwAgAmC|HfGidP`gLwr|@lka@y`LfiNoMdnFobGv~AolSfoWslErhJmy]dsSwaYfSuieA}tC{{GvpD}mOeImvAzG_jQsxBasBm_AgoBaGlKyB",
     stops: [
       { name: "Bloomington, IL", lat: 40.871, lng: -88.66842, note: "Depart 8:30 AM" },
-      { name: "Davenport, IA area", lat: 41.61786, lng: -90.78163, note: "11:11 AM–12:00 PM (48 min)" },
+      { name: "Iowa 80 Truck Stop — World's Largest Truck Stop", lat: 41.61786, lng: -90.78163, note: "11:11 AM–12:00 PM (48 min) — Walcott, IA" },
       { name: "Sioux Falls, SD", lat: 43.60145, lng: -96.76721, note: "Arrive 8:01 PM" }
     ]
   },
@@ -223,6 +223,7 @@ const actualLegs = [
     route: "omciGdsrmQao@jzB~Ahq_@qlPpdl@huE~cBzCvqs@hQrqe@ixElzcAkk@xCnNjFdAxb@sCpO{oA{WdDzB~@~QpkAxJkApm@UpAh@he@v]xKf]`|BrSuyCcVnkmAocDfav@ijBr}k@ubEphcAk|Fju@p@`lAoAz@rkA~{A{oUvveDqb@dlVzbDhtdAbK~dj@p_IrlzBbV`ihA^uAptFbb@nr@eUxHuMsGnL`~@dv@nr@b_Bfa@fEbFbBOzz@|`@cFpU_O~KcPjBl\\z@le@J`CtFpTug@l{AkS~rA`Ati@pQbh@qDjk@ap@fgAy\\rJcI{[c]oDm^x]eRlp@a_@l^wOrk@~Cpg@y]r^lBlc@iLzj@yYxOJpg@x^nFz]n~CiBl_AasAnpFGG{_@de@sX`sCay@|y@opAlLaWro@s`@vYIx]pHxQ{Edo@uh@v~@ks@`[cSnZiYzPx@rNeRxPv@d@_PlMyGhQxOzgAkt@js@oHx[{s@v~@cFz]ya@d_@mn@xzAX|b@sFx\\K~^~PtJzFzZ}Lzi@eAx^kNv\\mRrHc}IeCkAwbMwA{eDkmCdGmTfIeAR}wVxxaDreFhjM|_AvvApuAb[zsEhcOntGzvNteL`zSttBylAvNpkA{Bnj@p^dLvMfYpVhJ_FrPnA{J~IjBqIji@iZlJyWxWuf@rmAw`@jJ_UbcBfBfv@rU|u@c_@|hB~\\xiD|Urm@sUtn@x@xt@fSbd@sb@nY{dDsjAwO{^am@qMeBal@",
     stops: [
       { name: "Sioux Falls, SD", lat: 43.60424, lng: -96.76611, note: "Depart 7:34 AM" },
+      { name: "Corn Palace", lat: 43.71486, lng: -98.02524, note: "8:43 AM–9:28 AM (45 min) — Mitchell, SD" },
       { name: "Chamberlain, SD (Missouri River)", lat: 43.80793, lng: -99.3276, note: "10:37 AM–10:57 AM (19 min)" },
       { name: "Big Badlands Overlook", lat: 43.83391, lng: -101.90043, note: "12:53 PM–1:05 PM (11 min)" },
       { name: "Badlands Loop Rd", lat: 43.78478, lng: -101.90025, note: "1:11 PM–1:24 PM (12 min)" },
@@ -247,13 +248,13 @@ const actualLegs = [
       { name: "Sundance, WY area", lat: 44.26396, lng: -104.94456, note: "2:08 PM–2:28 PM (20 min)" },
       { name: "Devils Tower National Monument", lat: 44.59021, lng: -104.71462, note: "3:09 PM–3:39 PM (29 min)" },
       { name: "Broadus, MT", lat: 45.42182, lng: -105.397, note: "5:21 PM–5:29 PM (7 min)" },
-      { name: "Miles City, MT area", lat: 45.59514, lng: -106.27482, note: "6:14 PM–6:24 PM (10 min)" },
-      { name: "Forsyth/Hardin, MT area", lat: 45.57911, lng: -107.44722, note: "7:27 PM–7:35 PM (7 min)" },
+      { name: "Ashland, MT (US-212)", lat: 45.59514, lng: -106.27482, note: "6:14 PM–6:24 PM (10 min)" },
+      { name: "Near Little Bighorn Battlefield (stop was closed)", lat: 45.57911, lng: -107.44722, note: "7:27 PM–7:35 PM (7 min) — drove by the battlefield, stopped nearby but it was closed" },
       { name: "Billings, MT", lat: 45.75578, lng: -108.53882, note: "Arrive 9:07 PM" }
     ]
   },
   {
-    id: 5, color: "#607d8b", title: "Leg 5 — Billings, MT → Wallace, ID (current)",
+    id: 5, color: "#607d8b", title: "Leg 5 — Billings, MT → Wallace, ID",
     miles: 439.4, hours: 7.68,
     summary: "Actual GPS track: 439.4 mi, 7h 41m of real driving time. Took I-90 straight through — not the Lolo Pass/Moscow route from Version 2.",
     gmaps: "https://www.google.com/maps/dir/45.75448,-108.53785/45.67166,-111.0516/46.01124,-112.51833/46.87196,-113.99625/47.47256,-115.92581",
@@ -261,13 +262,28 @@ const actualLegs = [
     stops: [
       { name: "Billings, MT", lat: 45.75448, lng: -108.53785, note: "Depart 8:11 AM" },
       { name: "Laurel, MT", lat: 45.66596, lng: -108.7998, note: "8:28 AM–8:39 AM (10 min)" },
-      { name: "Bozeman, MT", lat: 45.67166, lng: -111.0516, note: "10:32 AM–11:04 AM (32 min)" },
-      { name: "Whitehall, MT area", lat: 45.92003, lng: -111.59879, note: "11:38 AM–11:44 AM (6 min)" },
+      { name: "Montana State University, Bozeman", lat: 45.67166, lng: -111.0516, note: "10:32 AM–11:04 AM (32 min) — campus visit" },
+      { name: "Three Forks, MT area", lat: 45.92003, lng: -111.59879, note: "11:38 AM–11:44 AM (6 min) — headwaters of the Missouri River" },
       { name: "Butte, MT", lat: 46.01124, lng: -112.51833, note: "12:35 PM–12:59 PM (24 min)" },
       { name: "Drummond/Bearmouth, MT", lat: 46.70307, lng: -113.34558, note: "2:08 PM–2:23 PM (15 min)" },
       { name: "Missoula, MT", lat: 46.87196, lng: -113.99625, note: "3:03 PM–4:51 PM (107 min)" },
       { name: "Wallace, ID", lat: 47.47297, lng: -115.92669, note: "7:04 PM–7:33 PM (28 min)" },
-      { name: "Wallace, ID", lat: 47.47256, lng: -115.92581, note: "Arrive 12:22 AM — most recent GPS point" }
+      { name: "Wallace, ID", lat: 47.47256, lng: -115.92581, note: "Arrive 12:22 AM" }
+    ]
+  },
+  {
+    id: 6, color: "#e91e8c", title: "Leg 6 — Wallace, ID → Seattle, WA (arrived!)",
+    miles: 345.2, hours: 7.02,
+    summary: "Actual GPS track: 345.2 mi, 7h 1m of real driving time. Made it to Seattle! Longer-than-planned Snoqualmie Falls stop (70 min) on the home stretch.",
+    gmaps: "https://www.google.com/maps/dir/47.47221,-115.92509/47.68327,-116.79691/47.29586,-118.0319/46.94721,-120.20929/47.49513,-121.78687/47.57275,-122.31529",
+    route: "i|v`HxrpbUw}B~qDtAbqB{jGlsWgpB|~c@h_@laI{jDrsMeEpsCczKvwa@}eJxta@|eBnSKoVwEfV|H{Ncs@ff@kHzGkm@|b@unA`tRjPdrPxhGriWci@d_XxUb`HxuAj{Cn_@~iUlsHjzSlgK`yQlkL~sRnuMbuRnnMlgSdsBjuHfg@zgFoGewIlt@v|Iria@zg`AlgDnb|A}wBfmkAeNpuWzN`te@|Ejhs@|xOllRzxH`bGhwAub@|xAzmRmn@tu[?AipEh_Vxz@hyg@qeLrjWo~AhH_uD`vMkbDl|Ek_@jhBmtB|yBkeCrpAw}@r~HwkBlfDwdAvgIdDtkBj~@feLm{@dz@{`FvoUmnDxvEooAr~FhFnvAqO`}Acl@rdAkxBjy@goAdxCogBjuBcbCzhE_eGnqBed@nvA_fBfxAcx@{B_k@|w@pMpvAdl@zjApdA`Jlj@`v@|Z`aBaUh|N}jAvpDot@p~@obAvyG{jA|`Ew@vpBqj@~wAshAzd@g~@rgEmTl|GwpArfAwd@qq@IKseC~rIrx@twIqyCxdIwOnbBjQjqDu^v~Az^|yAw`H`hTkOdrFo]xk@gzAnRkaAnl@geCvI}i@n^aT~l@aBnb@hk@biCaf@rkFqQx~Db@hPxDnMs_@xFw\\hx@yTvErCGnCfPp|@tk@|hAgH~d@lZpoBzRduAubA`eCeBfNm]",
+    stops: [
+      { name: "Wallace, ID", lat: 47.47221, lng: -115.92509, note: "Depart 8:07 AM" },
+      { name: "University of Idaho, Coeur d'Alene campus", lat: 47.68327, lng: -116.79691, note: "9:11 AM–9:44 AM (32 min) — co-located with North Idaho College" },
+      { name: "Ritzville, WA area", lat: 47.29586, lng: -118.0319, note: "10:56 AM–11:01 AM (5 min)" },
+      { name: "Ellensburg, WA (near Vantage)", lat: 46.94721, lng: -120.20929, note: "12:57 PM–1:05 PM (8 min)" },
+      { name: "Snoqualmie Falls", lat: 47.49513, lng: -121.78687, note: "2:42 PM–3:52 PM (70 min)" },
+      { name: "Seattle, WA", lat: 47.57275, lng: -122.31529, note: "Arrived 5:56 PM — trip complete!" }
     ]
   }
 ];
